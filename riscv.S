@@ -2,6 +2,7 @@
 /*
  * riscv.S -- start up code for no-MMU ELF link loader
  *
+ * Copyright (C) 2022-2023 Hesham Almatary <hesham.almatary@cl.cam.ac.uk>
  * (C) Copyright 2022, Greg Ungerer <gerg@kernel.org>
  */
 
@@ -11,13 +12,15 @@
 .global linker
 
 _start:
-	mv	s1, a0			/* save the _atexit func for later */
-	mv	a0, a1			/* 'mapaddr' for execitable */
-	mv	a1, a3			/* 'dynaddr' argument */
+	cmove	cs1, ca0			/* save the _atexit func for later */
+	cmove	ca0, ca1			/* 'mapaddr' for execitable */
+	cmove	ca1, ca3			/* 'dynaddr' argument */
 
-	call	linker			/* relocate it */
+	cllc cra, linker
+	cjalr cra
+	#call	linker			/* relocate it */
 
-	mv	ra, a0			/* program entry address */
-	mv	a0, s1			/* restore _atexit func ptr */
-	ret				/* start the program proper */
+	cmove	cra, ca0			/* program entry address */
+	cmove	ca0, cs1			/* restore _atexit func ptr */
+	cret				/* start the program proper */
 

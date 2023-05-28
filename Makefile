@@ -3,6 +3,7 @@
 # (C) Copyright 2023, Greg Ungerer (gerg@kernel.org)
 #
 
+CFLAGS += -target riscv64-linux-uclibc -march=rv64imaxcheri -mabi=l64pc128 -mno-relax -g
 CFLAGS += -O2
 CFLAGS += -fPIC
 CFLAGS += -fomit-frame-pointer
@@ -11,7 +12,7 @@ CFLAGS += $(EXTRA_CFLAGS)
 
 LDFLAGS += -Wl,--no-dynamic-linker
 LDFLAGS += -Wl,-z,noexecstack
-LDFLAGS += -Wl,-s
+#LDFLAGS += -Wl,-s
 LDFLAGS += -nostdlib
 
 OBJS = $(ARCH).o linker.o
@@ -26,13 +27,13 @@ checkarch:
 	fi
 
 uld.so.1: $(OBJS)
-	$(CROSS_COMPILE)gcc $(LDFLAGS) $(CFLAGS) -o uld.so.1 $(OBJS)
+	$(CROSS_COMPILE) $(LDFLAGS) $(CFLAGS) -o uld.so.1 $(OBJS)
 
 .S.o:
-	$(CROSS_COMPILE)gcc $(CFLAGS) -c $<
+	$(CROSS_COMPILE) $(CFLAGS) -c $<
 
 .c.o:
-	$(CROSS_COMPILE)gcc $(CFLAGS) -c $<
+	$(CROSS_COMPILE) $(CFLAGS) -c $<
 
 clean:
 	rm -f uld.so.1 *.o
